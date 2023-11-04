@@ -26,8 +26,8 @@ pipeline {
     }
 
     stage("Checkout from SCM"){
-       dir('source'){
-            steps {
+       steps{
+            dir('source') {
                 git branch: 'main', credentialsId: 'github', url: 'https://github.com/Matthew-Krueger/default-ingress-nginx.git'
             }
        }
