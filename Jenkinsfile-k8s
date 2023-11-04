@@ -26,29 +26,19 @@ pipeline {
     }
 
     stage("Checkout from SCM"){
+       dir('source'){
             steps {
                 git branch: 'main', credentialsId: 'github', url: 'https://github.com/Matthew-Krueger/default-ingress-nginx.git'
             }
+       }
+   }
 
-        }
-
-    stage('Build with Kaniko') {
+    stage('Build & Push with Kaniko') {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
                     sh '''#!/busybox/sh
 
-                        /kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --force=parseDockerfile
-                    '''
-        }
-      }
-    }
-    stage('Push with Kaniko') {
-      steps {
-        container(name: 'kaniko', shell: '/busybox/sh') {
-                    sh '''#!/busybox/sh
-
-                        /kaniko/executor --destination=${IMAGE_NAME}:${IMAGE_TAG} --force=parseDockerfile
-                        /kaniko/executor --destination=${IMAGE_NAME}:latest --force=parseDockerfile
+                        /kaniko/executor --dockerfile `pwd`/source/Dockerfile --context `pwd`/source --destination=${IMAGE_NAME}:${IMAGE_TAG} --destination=${IMAGE_NAME}:latest --force=parseDockerfile
                     '''
         }
       }
