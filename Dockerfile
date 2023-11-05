@@ -1,8 +1,18 @@
-# Use an official Nginx base image
-FROM nginx:latest
+FROM nginx:alpine
 
-# Copy your web application files to the Nginx document root
-COPY ./html /usr/share/nginx/html
+# Remove default NGINX Config
+RUN rm /etc/nginx/nginx.conf && \
+    rm /etc/nginx/conf.d/default.conf && \
+    ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log
 
-# Expose port 80 for incoming HTTP traffic
-EXPOSE 80
+# NGINX Config
+COPY etc/nginx.conf /etc/nginx/nginx.conf
+COPY etc/default.conf /etc/nginx/conf.d/default.conf
+
+# Resources
+COPY content/ /var/www/html/
+
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
